@@ -1,0 +1,5 @@
+[requires]
+icu/58.2@btolfa/stable
+
+[generators]
+cmake
