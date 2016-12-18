@@ -4,6 +4,7 @@ import os
 channel = os.getenv("CONAN_CHANNEL", "testing")
 username = os.getenv("CONAN_USERNAME", "btolfa")
 
+
 class IcuConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     requires = "icu/58.2@%s/%s" % (username, channel)
@@ -18,4 +19,4 @@ class IcuConan(ConanFile):
         self.copy(pattern="*.dll", dst="bin", src="bin")
 
     def test(self):
-        self.run(os.sep.join([".","bin", "tst_icu"]))
+        self.run(os.sep.join([".", "bin", "tst_icu"]))
