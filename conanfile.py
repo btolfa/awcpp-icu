@@ -13,8 +13,8 @@ class IcuConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     options = {"shared": [True, False]}
     default_options = "shared=False"
-    # It's shared on Windows anyway
     generator = "cmake"
+    exports = "icu-additional-ucm*"
 
     def is_visual_studio(self):
         return self.settings.compiler == "Visual Studio"
@@ -33,9 +33,7 @@ class IcuConan(ConanFile):
         shutil.rmtree("icu/source/data")
         shutil.move("data", "icu/source/data")
 
-        self.run("git clone %s.git" % self.url)
-
-        ucm_path = os.path.join(self.conanfile_directory, "awcpp-icu", "icu-additional-ucm")
+        ucm_path = os.path.join(self.conanfile_directory, "icu-additional-ucm")
         for fl in os.listdir(ucm_path):
             shutil.copy(os.path.join(ucm_path, fl), "icu/source/data/mapping")
 
@@ -80,8 +78,9 @@ class IcuConan(ConanFile):
         else:
             conf_name = self.settings.os
 
-        env = ConfigureEnvironment(self.deps_cpp_info, self.settings)
+        env = ConfigureEnvironment(self)
         command_env = env.command_line_env
+        command_env += " CXXFLAGS=-std=c++11"
         if os_info.is_windows:
             command_env += " &&"
 
@@ -103,8 +102,6 @@ class IcuConan(ConanFile):
         self.copy(pattern="*.lib", dst="lib", src=("icu/lib%s" % build_suffix), keep_path=False)
 
     def package_info(self):
-        self.cpp_info.cppflags = ["-std=c++11"]
-
         if os_info.is_windows:
             debug_suffix = ""
             if self.settings.build_type == "Debug":
